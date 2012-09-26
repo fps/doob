@@ -35,7 +35,36 @@ class text_item : public QGraphicsObject {
 
 typedef long long tick_size_t;
 
-class text_item : public QGraphicsWidget {
+class sequenced_item : public QGraphicsWidget {
+	Q_OBJECT
+
+	typedef int lane_size_t;
+	
+	/*
+		There's MAX_INT potential lanes
+	*/
+	lane_size_t lane;
+
+	/*
+		the tick that this item is positioned at
+	*/
+	tick_size_t tick;
+
+	public:
+	lane_size_t get_lane() {
+		return lane;
+	}
+
+	void set_lane(lane_size_t l) {
+		lane = l;
+	}
+
+	sequenced_item(lane_size_t lane = 0) : lane(lane) {
+
+	}
+};
+
+class text_item : public sequenced_item {
 	Q_OBJECT
 
 	QGraphicsRectItem *rect;
@@ -60,7 +89,7 @@ class text_item : public QGraphicsWidget {
 		edit = new QGraphicsTextItem();
 
 		edit->setTextInteractionFlags(Qt::TextEditorInteraction);
-		edit->setPlainText("c eb g\n\nc eb g\n\nc eb g\n\nc eb g\n\nc eb g\n\nc eb g\n\nc eb g\n\nc eb g\n\nc eb g\n\n");
+		edit->setPlainText("c eb g\n\nc eb g\n\nc eb g\n\nc eb g\n\nc eb g\n\nc eb g\n\nc eb g\n\nc eb g\n");
 		edit->setDefaultTextColor(QColor(255, 244, 233));
 		edit->setY(edit->y() - 2);
 		{
@@ -72,12 +101,12 @@ class text_item : public QGraphicsWidget {
 		}
 		edit->setParentItem(rect);
 
-		QPen pen(QColor(255, 255, 255, 128));
+		QPen pen(QColor(255, 255, 255, 64));
 		pen.setWidth(4);
 		rect->setPen(pen);
 		rect->setY(rect->y() - 2);
 		rect->setRect(QRectF(-100, -100, 200, 200));
-		rect->setBrush(QColor(255, 255, 255, 64));
+		rect->setBrush(QColor(255, 255, 255, 32));
 		rect->setParentItem(this);
 
 		connect(edit->document(), SIGNAL(contentsChanged()), this, SLOT(changed()));
@@ -108,10 +137,10 @@ class range_item : public QGraphicsWidget {
 		// setX(scene()->views().at(0)->mapToScene(10, 0).x());
 		QRectF r = rect->rect();
 
-		int width = view->width();
+		int width = view->viewport()->width();
 
-		r.setX(view->mapToScene(10, 0).x());
-		r.setWidth(view->mapToScene(width - 10, 0).x() - view->mapToScene(10, 0).x());
+		r.setX(view->mapToScene(0, 0).x());
+		r.setWidth(view->mapToScene(width, 0).x() - view->mapToScene(0, 0).x());
 			
 		rect->setRect(r);
 	}
@@ -134,6 +163,14 @@ class range_item : public QGraphicsWidget {
 	range_item() {
 		rect = new QGraphicsRectItem();
 		rect->setParentItem(this);
+
+		QPen pen(QColor(255, 55, 5));
+		pen.setWidth(8);
+		rect->setPen(pen);
+
+		QBrush brush(QColor(255, 33, 54, 16));
+		rect->setBrush(brush);
+
 #if 0
 		range_line = new QGraphicsLineItem();
 		start_line = new QGraphicsLineItem();
@@ -143,7 +180,7 @@ class range_item : public QGraphicsWidget {
 		start_line->setParentItem(this);
 		end_line->setParentItem(this);
 #endif
-		set_range(0, 64);
+		set_range(0, 16);
 
 		setOpacity(0.5);
 	}
@@ -151,11 +188,6 @@ class range_item : public QGraphicsWidget {
 	 void set_range(tick_size_t start_tick, tick_size_t end_tick) {
 		start = start_tick;
 		end = end_tick;
-
-		QPen pen(QColor(255, 155, 55));
-		pen.setWidth(8);
-
-		rect->setPen(pen);
 
 #if 0
 		range_line->setLine(0, start * text_item::line_height(), 0, end * text_item::line_height());
@@ -186,6 +218,7 @@ class sequence_view : public QGraphicsView {
 	sequence_view() : scroll_level(0) {
 		connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(view_change()));	
 		connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(view_change()));	
+		emit view_changed();
 	}
 
 	signals:
@@ -247,9 +280,13 @@ class main_window : public QMainWindow {
 		showMaximized();
 		view.setScene(&scene);
 
-		scene.setBackgroundBrush(QColor(69/2, 130/2, 90/2));
+		scene.setBackgroundBrush(QColor(69/4, 130/4, 90/4));
 		setCentralWidget(&view);
 
+		range_item *range = new range_item();
+		scene.addItem(range);
+		connect(&view, SIGNAL(view_changed()), range, SLOT(view_changed()));
+#if 0		
 		text_item *item1 = new text_item();
 		scene.addItem(item1);
 
@@ -262,9 +299,16 @@ class main_window : public QMainWindow {
 		item3->setY(17 * 4);
 		scene.addItem(item3);
 
-		range_item *range = new range_item();
-		scene.addItem(range);
-		connect(&view, SIGNAL(view_changed()), range, SLOT(view_changed()));
+#endif
+
+		for (int i = 0; i < 256; ++i) {
+			for (int j = 0; j < 32; ++j) {
+				text_item *item2 = new text_item();
+				item2->setY(text_item::line_height() * i * 16);
+				item2->setX(j * (item2->childrenBoundingRect().width() + 10));
+				scene.addItem(item2);
+			}
+		}
 
 		for (int i = -10000; i < 10000; ++i) {
 			QGraphicsRectItem *line = new QGraphicsRectItem();
