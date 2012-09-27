@@ -14,7 +14,7 @@ typedef double velocity_t;
  * (to check compatibility with a pattern/track)
  */
 struct note_track_event : event {
-    virtual ~note_track_event() { }
+
 };
 
 typedef shared_ptr<note_track_event> note_ptr;
