@@ -2,7 +2,7 @@
 #include <QApplication>
 #include <dbg.h>
 
-#include <song.h>
+#include <singleton.h>
 
 #include <carla_backend/carla_backend_standalone.h>
 
@@ -13,6 +13,8 @@ int main(int argc, char *argv[]) {
 
 	engine_init(get_engine_driver_name(0), "doob");
 
+	singleton::get();
+	
 	QApplication app(argc, argv);
 	main_window main_window;
 	main_window.show();
