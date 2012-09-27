@@ -23,6 +23,9 @@ endif()
 
 #add_definitions(-O3 -ffast-math -march=native -mtune=native -funsafe-math-optimizations -funroll-loops)
 #add_definitions(-pg)
+
+add_definitions(-std=c++0x)
+
 set(CMAKE_EXE_LINKER_FLAGS -pg)
 
 find_package(PkgConfig)
@@ -39,7 +42,7 @@ add_executable(doob main.cc main_window.cc ${moc_srcs})
 
 pkg_check_modules(DOOB samplerate sndfile jack)
 find_library(XERCES_C xerces-c)
-target_link_libraries(doob ${XERCES_C} ${QT_LIBRARIES} samplerate sndfile jack ${Boost_PROGRAM_OPTIONS_LIBRARY})
+target_link_libraries(doob ${XERCES_C} ${QT_LIBRARIES} carla_backend samplerate sndfile jack ${Boost_PROGRAM_OPTIONS_LIBRARY})
 include_directories(${QT_INCLUDE_DIRS} ${DOOB_INCLUDE_DIRS})
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 
