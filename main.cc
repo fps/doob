@@ -2,8 +2,9 @@
 #include <QApplication>
 #include <dbg.h>
 
-#include <carla-backend/carla_backend_standalone.h>
-#include <carla-backend/carla_plugin.h>
+#include <song.h>
+
+#include <carla_backend/carla_backend_standalone.h>
 
 int main(int argc, char *argv[]) {
 	for (int i = 0; i < get_engine_driver_count(); ++i) {
