@@ -7,13 +7,17 @@
 #include <jack/jack.h>
 
 namespace doob {
-	
-	using boost::shared_ptr;
-	using boost::weak_ptr;
 
-	typedef long long tick_size_t;
-	typedef double tempo_t;
-	typedef jack_time_t time_t;
-}
+using boost::shared_ptr;
+using boost::weak_ptr;
+
+typedef double tempo_t;
+
+/**
+ * A type for all times represented as ticks
+ */
+typedef jack_time_t tick_t;
+
+} // namespace
 
 #endif

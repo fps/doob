@@ -10,4 +10,4 @@ singleton::singleton() : the_song(new song())
 	
 }
 
-}
+} // namespace

@@ -6,7 +6,7 @@
 namespace doob {
 
 struct range {
-	range(tick_size_t start = 0, tick_size_t end = 64) :
+	range(tick_t start = 0, tick_t end = 64) :
 		start(start),
 		end(end)
 	{
@@ -16,12 +16,12 @@ struct range {
 	/**
 	 * The start tick is included i.e. start <= range
 	 */
-	tick_size_t start;
+	tick_t start;
 	
 	/**
 	 * The end tick is excluded range < end
 	 */
-	tick_size_t end;
+	tick_t end;
 };
 
 } // namespace

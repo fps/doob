@@ -18,6 +18,8 @@
 #include <types.h>
 #include <dbg.h>
 
+#include <cmath>
+
 using namespace doob;
 
 class sequenced_item : public QGraphicsWidget {
@@ -33,7 +35,7 @@ class sequenced_item : public QGraphicsWidget {
 	/*
 		the tick that this item is positioned at
 	*/
-	tick_size_t tick;
+	tick_t tick;
 
 	public:
 	lane_size_t get_lane() {
@@ -105,8 +107,8 @@ class range_item : public QGraphicsWidget {
 	/*
 		the range is defined as those ticks >= tick_start and < tick_end
 	*/
-	tick_size_t start;
-	tick_size_t end;
+	tick_t start;
+	tick_t end;
 
 	QGraphicsRectItem *rect;
 
@@ -147,7 +149,7 @@ class range_item : public QGraphicsWidget {
 		setOpacity(0.5);
 	}
 
-	 void set_range(tick_size_t start_tick, tick_size_t end_tick) {
+	 void set_range(tick_t start_tick, tick_t end_tick) {
 		start = start_tick;
 		end = end_tick;
 
@@ -210,7 +212,7 @@ class song_view : public QGraphicsView {
 	}
 
 	public slots:
-	void playback_position_change(tick_size_t tick) {
+	void playback_position_change(tick_t tick) {
 		
 	}
 

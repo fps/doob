@@ -7,7 +7,7 @@
 // #include <carla_backend/carla_backend_standalone.h>
 
 int main(int argc, char *argv[]) {
-	singleton::get();
+	singleton_ptr s = singleton::get();
 	
 	QApplication app(argc, argv);
 	main_window main_window;
@@ -15,6 +15,8 @@ int main(int argc, char *argv[]) {
 	
 	int ret = app.exec();
 
+	s->remove();
+	
 	return ret;
 }
 

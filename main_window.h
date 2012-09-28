@@ -15,12 +15,12 @@ class main_window : public QMainWindow {
 	song_view view;
 
 	public slots:
-	void playback_position_change(tick_size_t tick) {
+	void playback_position_change(tick_t tick) {
 		emit playback_position_changed(tick);
 	}
 	
 	signals:
-	void playback_position_changed(tick_size_t tick);
+	void playback_position_changed(tick_t tick);
 
 	public:
 	main_window() {

@@ -30,6 +30,6 @@ struct note_off : note_track_event {
 	velocity_t velocity;
 };
 
-}
+} // namespace
 
 #endif

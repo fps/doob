@@ -3,16 +3,17 @@
 
 #include <pattern.h>
 #include <types.h>
+#include <range.h>
 
 #include <map>
 
-using std::map;
-
 namespace doob {
+
+using std::map;
 
 struct song;
 
-/*
+/**
  * A track holds patterns. There are several subtypes of tracks
  * for the different kinds of patterns.
  * 
@@ -22,25 +23,39 @@ struct song;
  * 
  * Note that the start positions are inclusive, but the end
  * positions are exclusive
+ * 
+ * Note also that there is no notion of when a track starts or ends. 
+ * Patterns can have arbitrary start and end positions
  */
 struct track {
 	virtual ~track() { }
 	
+	track(weak_ptr<song> owner) : owner(owner) { }
+	
 	weak_ptr<song> owner;
 	
-	std::map<tick_size_t, boost::shared_ptr<pattern> > pattern_starts;
-	std::map<tick_size_t, boost::shared_ptr<pattern> > pattern_ends;
+	map<tick_t, boost::shared_ptr<pattern> > pattern_starts;
+	map<tick_t, boost::shared_ptr<pattern> > pattern_ends;
+
+	/**
+	 * Subclasses must be able to determine their span.
+	 * This function should be implemented as efficiently
+	 * as possible as it is used by the song views to 
+	 * determine what range to provide with e.g. the tick
+	 * lines.
+	 */
+	virtual range span() { 
+		return range();
+	}
 };
 
-
-/*
- * note_track is somewhat of a misnomer, since a note_track can
- * also hold control information
+/**
+ * A midi track holds midi_events
  */
-struct note_track : track {
+struct midi_track : track {
 	
 };
 
-}
+} // namespace
 
 #endif

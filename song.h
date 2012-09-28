@@ -21,6 +21,18 @@ using std::vector;
  * and some global parameters
  */
 struct song {
+	typedef double tempo_t;
+	
+	/**
+	 * The (base) tempo of the song is measured in
+	 * beats per minute (bpm)
+	 */
+	tempo_t tempo;
+	
+	/**
+	 * The global loop range. Note that patterns
+	 * can have their own loop range
+	 */
 	range loop_range;
 	
 	vector<shared_ptr<track> > tracks;
@@ -30,6 +42,6 @@ struct song {
 	}
 };
 
-}
+} // namespace
 
 #endif
