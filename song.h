@@ -7,6 +7,8 @@
 
 #include <vector>
 
+#include <QObject>
+
 namespace doob {
 
 using std::vector;
@@ -20,7 +22,10 @@ using std::vector;
  * 
  * and some global parameters
  */
-struct song {
+struct song : QObject {
+	Q_OBJECT
+	
+	public:
 	typedef double tempo_t;
 	
 	/**

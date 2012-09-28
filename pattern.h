@@ -2,14 +2,16 @@
 #define DOOB_PATTERN_HH
 
 #include <types.h>
+#include <midi_events.h>
 
-// #include <vector>
-//#include <map>
+#include <vector>
+#include <map>
+
 
 namespace doob {
 
-//using std::vector;
-//using std::map;
+using std::vector;
+using std::map;
 
 struct track;
 
@@ -27,11 +29,11 @@ struct pattern {
 };
 
 struct pattern_group : pattern {
-	//vector<shared_ptr<pattern> > children;
+	vector<shared_ptr<pattern> > children;
 };
 
-struct note_pattern {
-	//map<tick_t, note_ptr> notes;
+struct midi_pattern {
+	map<tick_t, midi_event_ptr> notes;
 };
 
 } // namespace

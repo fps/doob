@@ -39,7 +39,6 @@ struct midi_sink : midi_sink_base {
 	* before events fed to it take effect
 	*/
 	virtual time_t latency() = 0;
-	
 };
 
 }
