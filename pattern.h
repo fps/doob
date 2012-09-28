@@ -7,6 +7,8 @@
 #include <vector>
 #include <map>
 
+namespace doob {
+
 using std::vector;
 using std::map;
 
@@ -32,5 +34,7 @@ struct pattern_group : pattern {
 struct note_pattern {
 	map<tick_size_t, note_ptr> notes;
 };
+
+}
 
 #endif

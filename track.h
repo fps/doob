@@ -8,6 +8,8 @@
 
 using std::map;
 
+namespace doob {
+
 struct song;
 
 /*
@@ -17,6 +19,9 @@ struct song;
  * A track holds for each pattern the start end end positions.. This way
  * one can use the map find functions to locate all patterns that are 
  * "active" at a certain tick with O(log n) complexity.
+ * 
+ * Note that the start positions are inclusive, but the end
+ * positions are exclusive
  */
 struct track {
 	virtual ~track() { }
@@ -35,5 +40,7 @@ struct track {
 struct note_track : track {
 	
 };
+
+}
 
 #endif

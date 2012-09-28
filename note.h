@@ -4,6 +4,8 @@
 #include <types.h>
 #include <event.h>
 
+namespace doob {
+
 struct note_track;
 typedef double note_t;
 typedef double velocity_t;
@@ -27,5 +29,7 @@ struct note_on : note_track_event {
 struct note_off : note_track_event {
 	velocity_t velocity;
 };
+
+}
 
 #endif

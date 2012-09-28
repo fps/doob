@@ -18,6 +18,8 @@
 #include <types.h>
 #include <dbg.h>
 
+using namespace doob;
+
 class sequenced_item : public QGraphicsWidget {
 	Q_OBJECT
 
@@ -175,6 +177,7 @@ class song_view : public QGraphicsView {
 		scene.addItem(range);
 		connect(this, SIGNAL(view_changed()), range, SLOT(view_changed()));
 
+#if 0
 		for (int i = 0; i < 56; ++i) {
 			for (int j = 0; j < 32; ++j) {
 				text_item *item2 = new text_item();
@@ -191,6 +194,7 @@ class song_view : public QGraphicsView {
 			line->setPen(QColor(255, 255, 255, 0));
 			scene.addItem(line);
 		}
+#endif
 
 		connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(view_change()));	
 		connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(view_change()));	

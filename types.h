@@ -4,9 +4,16 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
-using boost::shared_ptr;
-using boost::weak_ptr;
+#include <jack/jack.h>
 
-typedef long long tick_size_t;
+namespace doob {
+	
+	using boost::shared_ptr;
+	using boost::weak_ptr;
+
+	typedef long long tick_size_t;
+	typedef double tempo_t;
+	typedef jack_time_t time_t;
+}
 
 #endif

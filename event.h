@@ -3,6 +3,8 @@
 
 #include <types.h>
 
+namespace doob {
+
 struct pattern;
 
 /*
@@ -16,5 +18,11 @@ struct event {
 	
 	weak_ptr<pattern> owner;
 };
+
+struct midi_event {
+	
+};
+
+}
 
 #endif
