@@ -179,25 +179,6 @@ class song_view : public QGraphicsView {
 		scene.addItem(range);
 		connect(this, SIGNAL(view_changed()), range, SLOT(view_changed()));
 
-#if 0
-		for (int i = 0; i < 56; ++i) {
-			for (int j = 0; j < 32; ++j) {
-				text_item *item2 = new text_item();
-				item2->setY(text_item::line_height() * i * 16);
-				item2->setX(j * (item2->childrenBoundingRect().width() + 10));
-				scene.addItem(item2);
-			}
-		}
-
-		for (int i = -100; i < 1000; ++i) {
-			QGraphicsRectItem *line = new QGraphicsRectItem();
-			line->setRect(-10000, 2 * i * text_item::line_height(), 20000, text_item::line_height());
-			line->setBrush(QColor(255, 255, 255, 16));
-			line->setPen(QColor(255, 255, 255, 0));
-			scene.addItem(line);
-		}
-#endif
-
 		connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(view_change()));	
 		connect(verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(view_change()));	
 		emit view_changed();
