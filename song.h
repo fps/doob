@@ -26,6 +26,7 @@ using std::vector;
  * NOTE: all GUI edit operations
  * have to pass through a ringbuffer 
  * to be performed by the realtime
+ * backend.
  * 
  * Once the edit is complete a number of
  * signals will be emitted (depending
@@ -39,7 +40,7 @@ using std::vector;
  * once there's no more reference to
  * it. 
  */
-struct song : QObject, stuff {
+struct song : QObject, stuff_base {
 	Q_OBJECT
 	
 	public:

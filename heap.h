@@ -13,17 +13,20 @@ using std::list;
  * A poor man's garbage collection mechanism
  */
 struct heap {
-	list<stuff_ptr> the_stuff;
+	list<stuff_base_ptr> the_stuff;
 	
 	/**
 	 * call this function regularly to 
 	 * remove deserted objects from the 
-	 * heap. Call this function from a
-	 * non-realtime thread only.
+	 * heap. 
+	 * 
+	 * NOTE: This function should be 
+	 * called regularly from the GUI
+	 * thread.
 	 */
 	void cleanup() {
 		for (
-			list<stuff_ptr>::iterator it = the_stuff.begin();
+			list<stuff_base_ptr>::iterator it = the_stuff.begin();
 			it != the_stuff.end();
 		) {
 			if (it->unique()) {
@@ -46,9 +49,13 @@ struct heap {
 	
 	/**
 	 * Add some stuff to the heap. This
-	 * way a reference is held
+	 * way a reference is held.
+	 * 
+	 * NOTE: This function should be
+	 * called only by the same thread
+	 * that calls cleanup(), too.
 	 */
-	void add(stuff_ptr some_stuff) {
+	void add(stuff_base_ptr some_stuff) {
 		the_stuff.push_back(some_stuff);
 	}
 };
