@@ -7,7 +7,7 @@
 namespace doob {
 
 /**
- * Base class for all kinds of events
+ * Base class for all kinds of midi events
  */
 struct midi_event : event {
 	typedef unsigned int note_t;

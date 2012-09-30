@@ -1,23 +1,21 @@
-doob
-====
+# doob
 
 doob booop deep 
 
+A somewhat different take on the sequencer/tracker thing.. 
+Highly experimental. Will crash and burn..
 
-Overview
-========
+# Overview
 
 doob consists of these main parts:
 
-The GUI
--------
+## The GUI
 
 The GUI is mostly QGraphicsView based. There is one main
 view of the song. This view is freely zoomable and
 draggable. 
 
-Sequence View
----------
+### Sequence View
 
 Controls (incl. mouse):
 
@@ -36,8 +34,7 @@ zooom either leaves the center of the view invariant or,
 if there's a current selection that is in the view, 
 leave its position invariant.
 
-Navigation View
----------------
+### Navigation View
 
 This view always shows the complete song and the current
 viewport as outlined rectangle. 
@@ -49,18 +46,17 @@ Controls:
 * ctrl-scrollwheel - change the zoom factor of the 
 sequence view
 
-* 
+
+## Realtime Considerations
+
+Since doob allows almost arbitrary scripting languages be 
+integrated to generate patterns (right now we only 
+support Lua) patterns can be either marked as realtime
+or non-realtime, since Lua snippets to produce e.g.
+midi sequences are inherintly non-realtime, non-realtime
+patterns operate on much larger buffer sizes to allow
+at least soft-realtime operation.
+
+### Realtime Patterns
 
 
-
-The Realtime Layer
-------------------
-
-
-
-The 
-Threads that produce output that is not dependent on the
-inputs. These threads do not use realtime scheduling. 
-
-* Threads that consume output. These are subject to realtime 
-constraints. 

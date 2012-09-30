@@ -4,6 +4,7 @@
 #include <types.h>
 #include <range.h>
 #include <track.h>
+#include <stuff.h>
 
 #include <vector>
 
@@ -21,8 +22,24 @@ using std::vector;
  * * Instruments
  * 
  * and some global parameters
+ * 
+ * NOTE: all GUI edit operations
+ * have to pass through a ringbuffer 
+ * to be performed by the realtime
+ * 
+ * Once the edit is complete a number of
+ * signals will be emitted (depending
+ * on what changed), so views can update 
+ * their state..
+ * 
+ * NOTE: All objects added to a song
+ * have to be also registered with 
+ * the heap, so safe disposable in a
+ * non-realtime thread can happen
+ * once there's no more reference to
+ * it. 
  */
-struct song : QObject {
+struct song : QObject, stuff {
 	Q_OBJECT
 	
 	public:
@@ -40,12 +57,14 @@ struct song : QObject {
 	 */
 	range loop_range;
 	
-	vector<shared_ptr<track> > tracks;
+	vector<shared_ptr<track_base> > tracks;
 	
 	song() {
 		
 	}
 };
+
+typedef shared_ptr<song> song_ptr;
 
 } // namespace
 

@@ -5,8 +5,6 @@
 
 namespace doob {
 
-struct pattern;
-
 /**
  * Abstract base class for all events that can be stored in 
  * patterns

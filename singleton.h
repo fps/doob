@@ -3,6 +3,7 @@
 
 #include <types.h>
 #include <dbg.h>
+#include <heap.h>
 
 namespace doob {
 
@@ -45,6 +46,7 @@ struct singleton {
 	}
 	
 	shared_ptr<song> the_song;
+	heap the_heap;
 };
 
 typedef shared_ptr<singleton> singleton_ptr;
