@@ -58,7 +58,7 @@ struct song : QObject, stuff_base {
 	 */
 	range loop_range;
 	
-	vector<shared_ptr<track_base> > tracks;
+	shared_ptr<vector<shared_ptr<track_base> > > tracks;
 	
 	song() {
 		
