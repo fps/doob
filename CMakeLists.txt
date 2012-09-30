@@ -36,7 +36,7 @@ find_package(Qt4)
 qt4_wrap_cpp(moc_srcs main_window.h song.h song_view.h qfunctor.h)
 include(${QT_USE_FILE})
 #add_executable(doob disposable.cc heap.cc  main.cc  main_window.cc  ${PROJECT_BINARY_DIR}/doob.cxx ${moc_srcs})
-add_executable(doob main.cc main_window.cc singleton.cc ${moc_srcs})
+add_executable(doob main.cc engine.cc main_window.cc singleton.cc ${moc_srcs})
 
 
 

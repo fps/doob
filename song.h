@@ -52,10 +52,6 @@ struct song : QObject, stuff_base {
 	 */
 	tempo_t tempo;
 	
-	/**
-	 * The global loop range. Note that patterns
-	 * can have their own loop range
-	 */
 	range loop_range;
 	
 	shared_ptr<vector<shared_ptr<track_base> > > tracks;
