@@ -2,11 +2,13 @@
 #define DOOB_ENGINE_HH
 
 #include <dbg.h>
+#include <processor.h>
 
 #include <jack/jack.h>
 #include <jack/midiport.h>
 
 #include <vector>
+#include <list>
 #include <string>
 #include <stdexcept>
 #include <sstream>
@@ -23,6 +25,7 @@ extern "C" {
 namespace doob {
 
 using std::vector;
+using std::list;
 using std::string;
 using std::runtime_error;
 using std::stringstream;
@@ -33,6 +36,7 @@ using std::stringstream;
  * jack.
  */
 struct engine {
+	private:
 	jack_client_t *jack_client;
 	
 	vector<jack_port_t*> audio_input_ports;
@@ -41,6 +45,10 @@ struct engine {
 	vector<jack_port_t*> midi_input_ports;
 	vector<jack_port_t*> midi_output_ports;
 	
+	list<processor_ptr> processors;
+	typedef list<processor_ptr> processors_t;
+	
+	public:
 	/**
 	 * NOTE: this constructor might throw.
 	 * Among others it might throw std::runtime_errors
@@ -80,6 +88,18 @@ struct engine {
 		remove_all_ports();
 		jack_deactivate(jack_client);
 		jack_client_close(jack_client);
+	}
+	
+	processors_t::iterator processors_begin() {
+		return processors.begin();
+	}
+
+	processors_t::iterator processors_end() {
+		return processors.end();
+	}
+
+	processors_t::iterator processors_remove(processors_t::iterator it) {
+		return processors.erase(it);
 	}
 	
 	void remove_all_ports() {
@@ -220,6 +240,13 @@ struct engine {
 
 	int process(jack_nframes_t) {
 		//std::cout << ".";
+		for (
+			processors_t::iterator it = processors_begin();
+			it != processors_end();
+			++it
+		) {
+			//(it)->process(
+		}
 		return 0;
 	}
 };
