@@ -5,6 +5,9 @@ doob booop deep
 A somewhat different take on the sequencer/tracker thing.. 
 Highly experimental. Will crash and burn..
 
+NOTE: Nothing of the below is implemented yet. This text
+simply serves as drawing board for ideas
+
 # Overview
 
 doob consists of these main parts:
@@ -17,15 +20,20 @@ draggable.
 
 ### Sequence View
 
-Controls (incl. mouse):
+Global sequence view controls (incl. mouse):
 
 * ctrl-scrollwheel - change the zoom factor. Note: zooming 
 this way leaves the position under the mouse cursor invariant.
 
 * ctrl-drag - move around in the view port
 
+* scrollwheel - scroll up and down in the viewport
 
-Controls (keyboard only)
+* shift-scrollwheel - scroll sideways in the viewport
+
+* horizontal scrollwheel - scroll sideways in the viewport
+
+Global sequence view controls (keyboard only)
 
 * pgup/pgdown move up/down in the sequence view
 
@@ -33,6 +41,12 @@ Controls (keyboard only)
 zooom either leaves the center of the view invariant or,
 if there's a current selection that is in the view, 
 leave its position invariant.
+
+#### Tracks
+
+The sequence view contains different tracks.
+
+##### 
 
 ### Navigation View
 
