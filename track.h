@@ -40,7 +40,27 @@ struct track : track_base {
 	 */
 	virtual range span() = 0;
 	
-	// virtual void render
+	/**
+	 * A track can either be realtime safe or not.
+	 * 
+	 * If it's not, its output will be buffered
+	 * in addition to the buffering of the jack
+	 * backend.
+	 * 
+	 * Not being buffered makes changes in the 
+	 * track to be audible  faster
+	 * than a buffered track.
+	 */
+	virtual bool is_rt() = 0;
+	
+	/**
+	 * Asks those patterns to render whose
+	 * ranges overlap with the tick. The 
+	 * buffer is guaranteed to be large enough
+	 * to contain all events/data for 
+	 * the tick.
+	 */
+	virtual void render(tick_t tick, void* buffer) = 0;
 };
 
 

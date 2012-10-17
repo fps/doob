@@ -10,6 +10,11 @@ namespace doob {
  * patterns
  */
 struct event {
+	/**
+	 * Since we pass all events through ringbuffers
+	 */
+	long long int event_type;
+	
 	virtual ~event() { }
 };
 

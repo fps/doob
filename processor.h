@@ -11,7 +11,9 @@ namespace doob {
 
 using std::string;
 using std::vector;
-	
+
+struct engine;
+
 /**
  * A processor is something that has
  * associated ports in the engine and 
@@ -23,53 +25,32 @@ using std::vector;
 struct processor {
 	string name;
 	
-	unsigned int num_in_ports;
-	unsigned int num_out_ports;
+	vector<jack_port_t*> ports;
+	
+	vector<float*> in_port_buffers;
+	vector<float*> out_port_buffers;
+	
+	weak_ptr<engine> the_engine;
 	
 	processor(
-		string name, 
-		unsigned int num_in_ports,
-		unsigned int num_out_ports) 
-	: 
-		name(name),
-		num_in_ports(num_in_ports),
-		num_out_ports(num_out_ports)
+		weak_ptr<engine> engine,
+		string name
+	) :
+		the_engine(engine),
+		name(name)
 	{ }
 	
-	/**
-	 * See the jack documentation for the 
-	 * interpretation of the void * data.
-	 * 
-	 * For every in and out port, there's 
-	 * an entry in the argument vectors.
-	 */
-	virtual void process(vector<void*> &ins, vector<void*> &outs) = 0;
+	virtual void process(jack_nframes_t nframes) = 0;
 
 	virtual ~processor() { }
 };
 
 typedef shared_ptr<processor>  processor_ptr;
 
-struct midi_processor : processor {
-	/**
-	 * See the jack documentation for the 
-	 * interpretation of the void * data.
-	 * 
-	 * For every in and out port, there's 
-	 * an entry in the argument vectors.
-	 */
-	virtual void process(vector<void*> &ins, vector<void*> &outs) = 0;
-};
+
 
 struct audio_processor : processor {
-	/**
-	 * See the jack documentation for the 
-	 * interpretation of the void * data.
-	 * 
-	 * For every in and out port, there's 
-	 * an entry in the argument vectors.
-	 */
-	virtual void process(vector<float*> &ins, vector<float*> &outs) = 0;
+
 };
 
 	

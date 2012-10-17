@@ -48,10 +48,13 @@ struct song : QObject, stuff_base {
 	
 	/**
 	 * The (base) tempo of the song is measured in
-	 * beats per minute (bpm)
+	 * ticks per minute (bpm)
 	 */
 	tempo_t tempo;
 	
+	/**
+	 * The global loop range
+	 */
 	range loop_range;
 	
 	shared_ptr<vector<shared_ptr<track_base> > > tracks;

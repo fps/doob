@@ -3,6 +3,9 @@
 
 #include <dbg.h>
 #include <processor.h>
+#include <ringbuffer.h>
+
+#include <boost/function.hpp>
 
 #include <jack/jack.h>
 #include <jack/midiport.h>
@@ -30,23 +33,30 @@ using std::string;
 using std::runtime_error;
 using std::stringstream;
 
+typedef boost::function<void(void)> command_t;
+
 /**
  * The engine consumes midi_events and audio from tracks
  * (ultimately from patterns) and plays them back via
  * jack.
  */
 struct engine {
-	private:
+	/**
+	 * commands are functors to be executed
+	 * in the RT context. 
+	 */
+	ringbuffer<command_t> commands;
+	
+	/**
+	 * Replies sent by the RT context.
+	 */
+	ringbuffer<command_t> replies;
+	
 	jack_client_t *jack_client;
 	
-	vector<jack_port_t*> audio_input_ports;
-	vector<jack_port_t*> audio_output_ports;
-
-	vector<jack_port_t*> midi_input_ports;
-	vector<jack_port_t*> midi_output_ports;
-	
-	list<processor_ptr> processors;
+	shared_ptr<list<processor_ptr> > processors;
 	typedef list<processor_ptr> processors_t;
+	typedef shared_ptr<processors_t> processors_t_ptr;
 	
 	public:
 	/**
@@ -56,11 +66,11 @@ struct engine {
 	 * reason for the failure..
 	 */
 	engine(
-		int num_audio_input_ports = 8,
-		int num_audio_output_ports = 8,
-		int num_midi_input_ports = 4,
-		int num_midi_output_ports = 4
-      	) {
+      	) :
+		commands(1024),
+		replies(1024),
+		processors(processors_t_ptr(new processors_t))
+      	{
 		DBG("engine()")
 		
 		jack_client = jack_client_open("doob", JackNullOption, NULL, 0);
@@ -69,14 +79,7 @@ struct engine {
 			DBG("Something went wrong")
 			throw runtime_error("Could not register jack client");
 		}
-		
-		adjust_port_count(
-			num_audio_input_ports,
-			num_audio_output_ports,
-			num_midi_input_ports,
-			num_midi_output_ports
-		);
-		
+				
 		jack_set_process_callback(jack_client, doob_engine_process, this);
 		
 		jack_activate(jack_client);
@@ -85,167 +88,34 @@ struct engine {
 	}
 	
 	~engine() {
-		remove_all_ports();
 		jack_deactivate(jack_client);
 		jack_client_close(jack_client);
+		processors = processors_t_ptr();
 	}
 	
 	processors_t::iterator processors_begin() {
-		return processors.begin();
+		return processors->begin();
 	}
 
 	processors_t::iterator processors_end() {
-		return processors.end();
+		return processors->end();
 	}
 
 	processors_t::iterator processors_remove(processors_t::iterator it) {
-		return processors.erase(it);
+		return processors->erase(it);
 	}
 	
-	void remove_all_ports() {
-		for (
-			unsigned int index = 0; 
-			index < audio_input_ports.size(); 
-			++index) {
-			
-			jack_port_unregister(jack_client, audio_input_ports[index]);
+	int process(jack_nframes_t nframes) {
+		if (commands.can_read()) {
+				commands.read()();
 		}
-
-		for (
-			unsigned int index = 0; 
-			index < audio_output_ports.size(); 
-			++index) {
-			
-			jack_port_unregister(jack_client, audio_output_ports[index]);
-		}
-
-		for (
-			unsigned int index = 0; 
-			index < midi_input_ports.size(); 
-			++index) {
-			
-			jack_port_unregister(jack_client, midi_input_ports[index]);
-		}
-
-		for (
-			unsigned int index = 0; 
-			index < midi_output_ports.size(); 
-			++index) {
-			
-			jack_port_unregister(jack_client, midi_output_ports[index]);
-		}
-
-	}
-	
-	void adjust_port_count(
-		int num_audio_input_ports,
-		int num_audio_output_ports,
-		int num_midi_input_ports,
-		int num_midi_output_ports
-	) {
-		remove_all_ports();
-		
-		for (
-			unsigned int index = 0; 
-			index < num_audio_input_ports; 
-			++index) {
-			
-			stringstream stream;
-			stream << "audio_in_" << index;
-			
-			jack_port_t *port = jack_port_register(
-				jack_client,
-				stream.str().c_str(),
-				JACK_DEFAULT_AUDIO_TYPE,
-				JackPortIsInput,
-				0
-			);
-		
-			if (NULL == port) {
-				throw runtime_error("could not register audio port " + stream.str());
-			}
-			
-			audio_input_ports.push_back(port);
-		}
-
-		for (
-			unsigned int index = 0; 
-			index < num_audio_output_ports; 
-			++index) {
-			
-			stringstream stream;
-			stream << "audio_out_" << index;
-			
-			jack_port_t *port = jack_port_register(
-				jack_client,
-				stream.str().c_str(),
-				JACK_DEFAULT_AUDIO_TYPE,
-				JackPortIsOutput,
-				0
-			);
-		
-			if (NULL == port) {
-				throw runtime_error("could not register audio port " + stream.str());
-			}
-			
-			audio_output_ports.push_back(port);
-		}
-
-		for (
-			unsigned int index = 0; 
-			index < num_midi_input_ports; 
-			++index) {
-			
-			stringstream stream;
-			stream << "midi_in_" << index;
-			
-			jack_port_t *port = jack_port_register(
-				jack_client,
-				stream.str().c_str(),
-				JACK_DEFAULT_MIDI_TYPE,
-				JackPortIsInput,
-				0
-			);
-		
-			if (NULL == port) {
-				throw runtime_error("could not register midi port " + stream.str());
-			}
-
-			midi_input_ports.push_back(port);
-		}
-
-		for (
-			unsigned int index = 0; 
-			index < num_midi_output_ports; 
-			++index) {
-			
-			stringstream stream;
-			stream << "midi_out_" << index;
-			
-			jack_port_t *port = jack_port_register(
-				jack_client,
-				stream.str().c_str(),
-				JACK_DEFAULT_MIDI_TYPE,
-				JackPortIsOutput,
-				0
-			);
-			
-			if (NULL == port) {
-				throw runtime_error("could not register midi port " + stream.str());
-			}
-		
-			midi_output_ports.push_back(port);
-		}
-	}
-
-	int process(jack_nframes_t) {
 		//std::cout << ".";
 		for (
 			processors_t::iterator it = processors_begin();
 			it != processors_end();
 			++it
 		) {
-			//(it)->process(
+			(*it)->process(nframes);
 		}
 		return 0;
 	}

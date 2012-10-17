@@ -46,9 +46,9 @@ struct singleton {
 		instance = shared_ptr<singleton>();
 	}
 	
+	shared_ptr<engine> the_engine;
 	shared_ptr<song> the_song;
-	heap the_heap;
-	engine the_engine;
+	shared_ptr<heap> the_heap;
 };
 
 typedef shared_ptr<singleton> singleton_ptr;
