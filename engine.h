@@ -54,9 +54,10 @@ struct engine {
 	
 	jack_client_t *jack_client;
 	
-	shared_ptr<list<processor_ptr> > processors;
 	typedef list<processor_ptr> processors_t;
 	typedef shared_ptr<processors_t> processors_t_ptr;
+	
+	processors_t_ptr processors;
 	
 	public:
 	/**
@@ -76,7 +77,6 @@ struct engine {
 		jack_client = jack_client_open("doob", JackNullOption, NULL, 0);
 		
 		if (NULL == jack_client) {
-			DBG("Something went wrong")
 			throw runtime_error("Could not register jack client");
 		}
 				
@@ -84,7 +84,7 @@ struct engine {
 		
 		jack_activate(jack_client);
 		
-		DBG("client activated")
+		DBG("client activated...")
 	}
 	
 	~engine() {
@@ -107,6 +107,7 @@ struct engine {
 	
 	int process(jack_nframes_t nframes) {
 		if (commands.can_read()) {
+				DBG("cmd")
 				commands.read()();
 		}
 		//std::cout << ".";
@@ -122,9 +123,7 @@ struct engine {
 };
 
 
-};
-
-
+} // namespace
 
 
 #endif

@@ -42,7 +42,7 @@ struct singleton {
 	 * are still alive, but you get a new instance
 	 * the next time you call get()
 	 */
-	void remove() {
+ 	static void remove() {
 		instance = shared_ptr<singleton>();
 	}
 	

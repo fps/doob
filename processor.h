@@ -48,12 +48,6 @@ struct processor {
 typedef shared_ptr<processor>  processor_ptr;
 
 
-
-struct audio_processor : processor {
-
-};
-
-	
 } // namespace
 
 #endif

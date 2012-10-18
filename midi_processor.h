@@ -70,7 +70,7 @@ struct midi_processor : processor {
 		
 	}
 	
-	virtual void process(jack_nframes_t nframes) { DBG(".") }
+	virtual void process(jack_nframes_t nframes) { DBG(the_engine.lock()->jack_client) }
 };
 
 typedef shared_ptr<midi_processor> midi_processor_ptr;
