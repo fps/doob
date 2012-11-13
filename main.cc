@@ -3,7 +3,7 @@
 #include <dbg.h>
 
 #include <singleton.h>
-#include <midi_processor.h>
+#include <midi_track.h>
 #include <assign.h>
 
 #include <boost/shared_ptr.hpp>
@@ -15,35 +15,33 @@ using boost::shared_ptr;
 using namespace doob;
 
 int main(int argc, char *argv[]) {
-	singleton_ptr s = singleton::get();
 	int ret = 0;
-	
-	{
-		midi_processor_ptr mp(
-			new midi_processor(s->the_engine, "midi1", 1)
-		);
-		
-		engine::processors_t_ptr processors(
-			new engine::processors_t(*(s->the_engine->processors))
-		);
-		
-		processors->push_back(mp);
-		
-		s->the_engine->commands.write(
-			assign(s->the_engine->processors, processors)
-		);
-	
-		//s->the_engine->processors->push_back(mp);
 
+	shared_ptr<engine> e(new engine());
+
+	midi_track_ptr mp(
+		new midi_track(e, "midi1", 1)
+	);
+
+	engine::processors_t_ptr processors(
+		new engine::processors_t(*(e->processors))
+	);
+	
+	processors->push_back(mp);
+
+	e->commands.write(
+		assign(e->processors, processors)
+	);
+
+	{
 		QApplication app(argc, argv);
 		main_window main_window;
 		main_window.show();
-
 		ret = app.exec();
 	}
-	
-	singleton::remove();
-	
+
+
+	DBG("exiting...")
 	return ret;
 }
 

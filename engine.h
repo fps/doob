@@ -67,11 +67,12 @@ struct engine {
 	 * reason for the failure..
 	 */
 	engine(
-      	) :
+		
+	) :
 		commands(1024),
 		replies(1024),
 		processors(processors_t_ptr(new processors_t))
-      	{
+	{
 		DBG("engine()")
 		
 		jack_client = jack_client_open("doob", JackNullOption, NULL, 0);
@@ -88,9 +89,17 @@ struct engine {
 	}
 	
 	~engine() {
+		DBG("~engine()...")
 		jack_deactivate(jack_client);
+		for (processors_t::iterator it = processors_begin(); it != processors_end(); ++it) {
+			for (unsigned int index = 0; index < (*it)->ports.size(); ++index) {
+				
+			}
+		}
+		
 		jack_client_close(jack_client);
-		processors = processors_t_ptr();
+		// commands = ringbuffer<command_t>(10);
+		DBG("...~engine()")
 	}
 	
 	processors_t::iterator processors_begin() {

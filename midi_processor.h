@@ -15,8 +15,8 @@ namespace doob {
 using std::string;
 
 struct midi_processor : processor {
-	midi_processor(weak_ptr<engine> engine, string name, unsigned int num_channels) :
-		processor(engine, name)
+	midi_processor(weak_ptr<engine> the_engine, string name, unsigned int num_channels) :
+		processor(the_engine, name)
 	{ 
 		for (
 			unsigned int index = 0; 
@@ -57,17 +57,6 @@ struct midi_processor : processor {
 			
 			ports.push_back(port);
 		}
-	}
-
-	~midi_processor() {
-		for (
-			unsigned int index = 0; 
-			index < ports.size(); 
-			++index) 
-		{	
-			jack_port_unregister(the_engine.lock()->jack_client, ports[index]);
-		}
-		
 	}
 	
 	virtual void process(jack_nframes_t nframes) { DBG(the_engine.lock()->jack_client) }

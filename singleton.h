@@ -21,7 +21,7 @@ struct singleton {
 	
 	public:
 	~singleton() {
-		DBG("singleton destroyed")
+		DBG("~singleton")
 	}
 	
 	/**

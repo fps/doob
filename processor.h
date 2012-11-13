@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <types.h>
+#include <dbg.h>
 #include <midi_events.h>
 
 namespace doob {
@@ -33,16 +34,16 @@ struct processor {
 	weak_ptr<engine> the_engine;
 	
 	processor(
-		weak_ptr<engine> engine,
+		weak_ptr<engine> the_engine,
 		string name
 	) :
-		the_engine(engine),
+		the_engine(the_engine),
 		name(name)
 	{ }
 	
 	virtual void process(jack_nframes_t nframes) = 0;
 
-	virtual ~processor() { }
+	virtual ~processor() { DBG("~processor") }
 };
 
 typedef shared_ptr<processor>  processor_ptr;

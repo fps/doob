@@ -11,14 +11,11 @@ namespace doob {
 
 using std::map;
 
-struct song;
 
 struct track_base {
 	virtual ~track_base() { }
 
-	track_base(weak_ptr<song> owner) : owner(owner) { }
-	
-	weak_ptr<song> owner;
+	track_base()  { }
 };
 
 /**
@@ -48,7 +45,7 @@ struct track : track_base {
 	 * backend.
 	 * 
 	 * Not being buffered makes changes in the 
-	 * track to be audible  faster
+	 * track to be audible more quickly
 	 * than a buffered track.
 	 */
 	virtual bool is_rt() = 0;
