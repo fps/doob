@@ -109,8 +109,8 @@ class range_item : public QGraphicsWidget {
 	/*
 		the range is defined as those ticks >= tick_start and < tick_end
 	*/
-	time start;
-	time end;
+	doob::time start;
+	doob::time end;
 
 	QGraphicsRectItem *rect;
 
@@ -151,7 +151,7 @@ class range_item : public QGraphicsWidget {
 		setOpacity(0.5);
 	}
 
-	 void set_range(time start_time, time end_time) {
+	 void set_range(doob::time start_time, doob::time end_time) {
 		start = start_time;
 		end = end_time;
 
