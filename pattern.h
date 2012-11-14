@@ -3,6 +3,7 @@
 
 #include <types.h>
 #include <midi_events.h>
+#include <range.h>
 
 #include <vector>
 #include <map>

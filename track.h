@@ -3,6 +3,7 @@
 
 #include <pattern.h>
 #include <types.h>
+#include <time.h>
 #include <range.h>
 
 #include <map>
@@ -25,8 +26,8 @@ struct track_base {
 template<class EventType>
 struct track : track_base {
 
-	map<time_t, boost::shared_ptr<pattern<EventType> > > pattern_starts;
-	map<time_t, boost::shared_ptr<pattern<EventType> > > pattern_ends;
+	map<time, boost::shared_ptr<pattern<EventType> > > pattern_starts;
+	map<time, boost::shared_ptr<pattern<EventType> > > pattern_ends;
 	
 	/**
 	 * Subclasses must be able to determine their span.
