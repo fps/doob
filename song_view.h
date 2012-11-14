@@ -17,6 +17,8 @@
 
 #include <types.h>
 #include <dbg.h>
+#include <engine.h>
+#include <time.h>
 
 #include <cmath>
 
@@ -35,7 +37,7 @@ class sequenced_item : public QGraphicsWidget {
 	/*
 		the tick that this item is positioned at
 	*/
-	tick_t tick;
+	doob::time time;
 
 	public:
 	lane_size_t get_lane() {
@@ -107,8 +109,8 @@ class range_item : public QGraphicsWidget {
 	/*
 		the range is defined as those ticks >= tick_start and < tick_end
 	*/
-	tick_t start;
-	tick_t end;
+	doob::time_t start;
+	doob::time_t end;
 
 	QGraphicsRectItem *rect;
 
@@ -149,9 +151,9 @@ class range_item : public QGraphicsWidget {
 		setOpacity(0.5);
 	}
 
-	 void set_range(tick_t start_tick, tick_t end_tick) {
-		start = start_tick;
-		end = end_tick;
+	 void set_range(doob::time_t start_time, doob::time_t end_time) {
+		start = start_time;
+		end = end_time;
 
 		rect->setRect(QRectF(0, start * text_item::line_height(), 0, (end - start) * text_item::line_height()));
 	}
@@ -160,6 +162,8 @@ class range_item : public QGraphicsWidget {
 class song_view : public QGraphicsView {
 	Q_OBJECT
 
+	shared_ptr<engine> the_engine;
+	
 	QGraphicsScene scene;
 
 	/*
@@ -171,7 +175,9 @@ class song_view : public QGraphicsView {
 	scroll_level_size_t scroll_level;
 
 	public:
-	song_view() : scroll_level(0) {
+	song_view(shared_ptr<engine> the_engine) : 
+		the_engine(the_engine),
+		scroll_level(0) {
 		setScene(&scene);
 		scene.setBackgroundBrush(QColor(69/4, 130/4, 90/4));
 
@@ -193,7 +199,7 @@ class song_view : public QGraphicsView {
 	}
 
 	public slots:
-	void playback_position_change(tick_t tick) {
+	void playback_position_change(doob::time time) {
 		
 	}
 

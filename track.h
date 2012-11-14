@@ -25,8 +25,8 @@ struct track_base {
 template<class EventType>
 struct track : track_base {
 
-	map<tick_t, boost::shared_ptr<pattern<EventType> > > pattern_starts;
-	map<tick_t, boost::shared_ptr<pattern<EventType> > > pattern_ends;
+	map<time_t, boost::shared_ptr<pattern<EventType> > > pattern_starts;
+	map<time_t, boost::shared_ptr<pattern<EventType> > > pattern_ends;
 	
 	/**
 	 * Subclasses must be able to determine their span.
@@ -57,7 +57,7 @@ struct track : track_base {
 	 * to contain all events/data for 
 	 * the tick.
 	 */
-	virtual void render(tick_t tick, void* buffer) = 0;
+	virtual void render(range the_range, void* buffer) = 0;
 };
 
 

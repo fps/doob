@@ -2,11 +2,12 @@
 #define DOOB_RANGE_HH
 
 #include <types.h>
+#include <time.h>
 
 namespace doob {
 
 struct range {
-	range(tick_t start = 0, tick_t end = 64) :
+	range(time start = time(), time end = time()) :
 		start(start),
 		end(end)
 	{
@@ -16,12 +17,12 @@ struct range {
 	/**
 	 * The start tick is included i.e. start <= range
 	 */
-	tick_t start;
+	time start;
 	
 	/**
 	 * The end tick is excluded range < end
 	 */
-	tick_t end;
+	time end;
 };
 
 } // namespace

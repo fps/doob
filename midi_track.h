@@ -17,7 +17,7 @@ struct midi_track : track<midi_event>, midi_processor {
 	
 	virtual bool is_rt() { return true; }
 	virtual range span() { return span(); }
-	virtual void render(tick_t tick, void* buffer) { }
+	virtual void render(range the_range, void* buffer) { }
 };
 
 typedef shared_ptr<midi_track> midi_track_ptr;

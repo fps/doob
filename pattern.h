@@ -25,7 +25,7 @@ struct pattern {
 	
 	virtual ~pattern() { }
 	
-	virtual tick_t length() const = 0;
+	virtual range span() const = 0;
 	
 	/**
 	 * If a pattern reports true == is_realtime(), then
@@ -44,7 +44,7 @@ struct pattern_group : pattern<EventType> {
 
 template<class EventType>
 struct midi_pattern : pattern<EventType> {
-	map<tick_t, midi_event_ptr> notes;
+	map<time, midi_event_ptr> notes;
 };
 
 } // namespace

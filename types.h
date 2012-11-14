@@ -16,7 +16,7 @@ typedef double tempo_t;
 /**
  * A type for all times represented as ticks
  */
-typedef jack_time_t tick_t;
+typedef jack_time_t frame_t;
 
 } // namespace
 

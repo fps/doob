@@ -17,25 +17,25 @@ using namespace doob;
 int main(int argc, char *argv[]) {
 	int ret = 0;
 
-	shared_ptr<engine> e(new engine());
+	shared_ptr<engine> the_engine(new engine());
 
 	midi_track_ptr mp(
-		new midi_track(e, "midi1", 1)
+		new midi_track(the_engine, "midi1", 1)
 	);
 
 	engine::processors_t_ptr processors(
-		new engine::processors_t(*(e->processors))
+		new engine::processors_t(*(the_engine->processors))
 	);
 	
 	processors->push_back(mp);
 
-	e->commands.write(
-		assign(e->processors, processors)
+	the_engine->commands.write(
+		assign(the_engine->processors, processors)
 	);
 
 	{
 		QApplication app(argc, argv);
-		main_window main_window;
+		main_window main_window(the_engine);
 		main_window.show();
 		ret = app.exec();
 	}
