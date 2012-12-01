@@ -4,6 +4,8 @@ from PyQt4.QtCore import *
 import subprocess
 
 from graph import *
+from ladspa import *
+from plugin_model import *
 
 def to_json(python_object):
 	if isinstance(python_object, QGraphicsScene):
@@ -49,18 +51,22 @@ class main_window(QMainWindow):
 	def to_json(self):
 		return {'__class__': 'main_window', '__value__': { 'scene': self.scene, 'views': [self.tab_widget.widget(index) for index in range(self.tab_widget.count())] } }
 
-	def __init__(self, ladspa_plugins):
+	def __init__(self):
 		QMainWindow.__init__(self)
 
 		self.scene = QGraphicsScene()
 		
-
-		self.log = QTextEdit()
+		self.log = QPlainTextEdit()
+		self.log.setMaximumBlockCount(2000)
+		self.log.setReadOnly(True)
+		self.log.appendPlainText("Hi, welcome to LOG")
+		self.log.appendPlainText("All the kids love LOG")
 		self.log_dock = QDockWidget()
 		self.log_dock.setObjectName("log_dock")
 		self.log_dock.setWidget(self.log)
 		self.log_dock.setWindowTitle("It's fresh, it's new, it's LOG!!!")
 		self.addDockWidget(Qt.BottomDockWidgetArea, self.log_dock)
+
 
 		self.nav_view = navigation_view(self)
 		self.nav_view.setScene(self.scene)
@@ -75,13 +81,13 @@ class main_window(QMainWindow):
 		box_layout = QVBoxLayout()
 		
 		self.plugin_selector_line_edit = QLineEdit()
-		self.setup_plugin_selector(ladspa_plugins)
 		self.plugin_selector_dock = QDockWidget()
 		self.plugin_selector_dock.setObjectName("plugin_selector_dock")
 		self.plugin_selector_dock.setWindowTitle("Plugin Selector")
 		self.plugin_selector_dock.setWidget(self.plugin_selector_line_edit)
 		self.addDockWidget(Qt.TopDockWidgetArea, self.plugin_selector_dock)
 		# box_layout.addWidget(self.plugin_selector_line_edit)
+		
 		
 		self.settings = QSettings("fps.io", "doob.m")
 		if self.settings.contains("main_window/geometry"):
@@ -110,6 +116,16 @@ class main_window(QMainWindow):
 		self.connection_update_timer.timeout.connect(self.connection_update_timeout)
 		self.connection_update_timer.setSingleShot(False)
 		self.connection_update_timer.start()
+
+	def post_show(self):
+		ladspa_plugins = discover_ladspa_plugins(self.append_to_log)
+		self.setup_plugin_selector(ladspa_plugins)
+
+
+	def append_to_log(self, x):
+		self.log.appendPlainText(x)
+		QApplication.processEvents()
+			
 
 	def setup_menu(self):
 		menubar = self.menuBar()
@@ -141,12 +157,21 @@ class main_window(QMainWindow):
 		view_menu.addAction(shrink_scene_action)
 		view_menu.triggered.connect(self. shrink_scene)
 		
-		
+		edit_menu = menubar.addMenu("&Edit")
+		remove_item_action = QAction("&Remove", self)
+		remove_item_action.setShortcut(Qt.Key_Delete)
+		remove_item_action.triggered.connect(self.remove)
+		edit_menu.addAction(remove_item_action)
 				
 	def shrink_scene(self):
 		self.nav_view.setSceneRect(self.scene.itemsBoundingRect())
 		self.nav_view.fit()
-		
+	
+	def remove(self):
+		for item in self.scene.selectedItems():
+			item.stop()
+			self.scene.removeItem(item)
+	
 	def add_view(self):
 		view = graph_view()
 		view.setScene(self.scene)
@@ -161,18 +186,16 @@ class main_window(QMainWindow):
 	def setup_plugin_selector(self, ladspa_plugins):
 		self.plugin_selector_line_edit.setPlaceholderText("Enter a plugin name here and press enter to add it to the graph")
 		
-		pluginlist = []
-		for plugin in ladspa_plugins:
-			pluginlist.append("LADSPA --- " + plugin[1] + " --- " + plugin[0] + " --- " + plugin[2])
-		
-		pluginlist.append("INTERNAL --- " + "MidiNote")
-		
-		completer = QCompleter(pluginlist)
+		completer = plugin_completer(self.plugin_selector_line_edit)
+		model = plugin_model(self, ladspa_plugins)
+		completer.setModel(model)
+		completer.setCompletionRole(Qt.DisplayRole)
 		completer.setCaseSensitivity(Qt.CaseInsensitive)
 		completer.setMaxVisibleItems(1000)
 
 		self.plugin_selector_line_edit.setCompleter(completer)
-		self.plugin_selector_line_edit.returnPressed.connect(self.plugin_selected)
+		completer.activated.connect(self.plugin_selected)
+		#self.plugin_selector_line_edit.returnPressed.connect(self.plugin_selected)
 
 
 	def closeEvent(self, event):
@@ -188,10 +211,11 @@ class main_window(QMainWindow):
 
 
 	def plugin_selected(self):
-		components = self.plugin_selector_line_edit.text().split(" --- ")
+		print self.plugin_selector_line_edit.completer().currentIndex().data(Qt.DisplayRole).toString()
+		components = self.plugin_selector_line_edit.text().split(" ~~~ ")
 		print(list(components))
 		
-		if components[0] == "LADSPA":
+		if components[3] == "LADSPA":
 			l = ladspa_node(components[2], components[1])
 			self.scene.addItem(l)
 			
@@ -219,4 +243,4 @@ class main_window(QMainWindow):
 				current_portname = component.strip()
 			# print component
 			
-		print jack_connections
+		#print jack_connections

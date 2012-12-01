@@ -28,6 +28,8 @@ class node(QGraphicsRectItem):
 		
 		self.state = node.DEAD
 		self.base_brush_color = [48*2, 85*2, 67*2]
+		self.selected_color = [200, 179, 110]
+		self.current_color = self.base_brush_color
 		self.highlighed_brush_colors = { node.DEAD: [128, 0, 0], node.ALIVE: [0, 60, 0], node.ACTIVATED: [30, 30, 30] }
 		self.highlight_timer_count = 0
 		
@@ -39,13 +41,13 @@ class node(QGraphicsRectItem):
 		pen.setWidth(4)
 		self.setPen(pen)
 		
-		self.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemSendsGeometryChanges)
+		self.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemSendsGeometryChanges |QGraphicsItem.ItemIsSelectable)
 		
 		self.glow_timer = QTimer()
 		self.glow_timer.setSingleShot(False)
 		self.glow_timer.timeout.connect(self.glow_timer_timedout)
 		self.glow_timer.setInterval(250)
-		self.glow_timer.start()
+		#self.glow_timer.start()
 	
 	def color(self, array):
 		capped = map(lambda x: min(255,x), array)
@@ -55,10 +57,11 @@ class node(QGraphicsRectItem):
 		# print self.highlight_timer_count
 		self.highlight_timer_count += 1
 		self.highlight_timer_count %= 10
+
 		if self.highlight_timer_count % 10 == 0:
-			self.setBrush(QBrush(self.color(map(sum, zip(self.highlighed_brush_colors[self.state], self.base_brush_color)))))
-		if self.highlight_timer_count % 10 == 1:
-			self.setBrush(QBrush(self.color(self.base_brush_color)))
+			self.setBrush(QBrush(self.color(map(sum, zip(self.highlighed_brush_colors[self.state], self.current_color)))))
+		if not self.highlight_timer_count % 10 == 0:
+			self.setBrush(QBrush(self.color(self.current_color)))
 	
 	def itemChange(self, change, value):
 		# print "change"
@@ -68,7 +71,15 @@ class node(QGraphicsRectItem):
 			new_pos.setY(math.floor(new_pos.y() / self.monospace_font_metric.lineSpacing()) * (self.monospace_font_metric.lineSpacing()))
 			# print "pos"
 			return new_pos
-			
+		
+		if change == QGraphicsItem.ItemSelectedChange:
+			if True == value.toBool():
+				self.current_color = self.selected_color
+				self.setBrush(QBrush(self.color(self.current_color)))
+			else:
+				self.current_color = self.base_brush_color
+				self.setBrush(QBrush(self.color(self.current_color)))
+
 		return QGraphicsItem.itemChange(self, change, value)
 
 class process_node(node):
@@ -87,9 +98,6 @@ class process_node(node):
 	def start(self):
 		pass
 	
-	def stop(self):
-		pass
-
 	def process_error(self):
 		self.state = node.DEAD
 		
@@ -143,6 +151,7 @@ class ladspa_node(jack_client_node):
 		self.plugin_name = QGraphicsTextItem()
 		self.plugin_name.setParentItem(self)
 		self.plugin_name.setPlainText(self.library + "\n" + self.label)
+		self.plugin_name.setTextWidth(130.0)
 		
 		self.ports = []
 		self.sink_ports = []
@@ -151,15 +160,12 @@ class ladspa_node(jack_client_node):
 
 		self.adjust_children()
 
-		self.service_name = self.make_service_name("io.fps.doob.Ladspa" + str(self.label))
+		self.service_name = self.make_service_name("io.fps.doob.Ladspa")
 
-		try:
-			self.bus = dbus.SessionBus()
-			self.bus.add_signal_receiver(handler_function=self.process_port_changed, signal_name="PortsChanged", bus_name=self.service_name, dbus_interface="io.fps.doob.ladspa")
-			self.bus.add_signal_receiver(handler_function=self.process_jack_client_name_changed, signal_name="JackNameChanged", bus_name=self.service_name, dbus_interface="io.fps.doob.jack_client")
-			self.bus.add_signal_receiver(handler_function=self.process_plugin_name_changed, signal_name="PluginNameChanged", bus_name=self.service_name, dbus_interface="io.fps.doob.ladspa")
-		except:
-			print "GNAHAHAH"
+		self.bus = dbus.SessionBus()
+		self.bus.add_signal_receiver(handler_function=self.process_port_changed, signal_name="PortsChanged", bus_name=self.service_name, dbus_interface="io.fps.doob.ladspa")
+		self.bus.add_signal_receiver(handler_function=self.process_jack_client_name_changed, signal_name="JackNameChanged", bus_name=self.service_name, dbus_interface="io.fps.doob.jack_client")
+		self.bus.add_signal_receiver(handler_function=self.process_plugin_name_changed, signal_name="PluginNameChanged", bus_name=self.service_name, dbus_interface="io.fps.doob.ladspa")
 			
 		self.start()
 
@@ -200,7 +206,7 @@ class ladspa_node(jack_client_node):
 			portname = QGraphicsTextItem()
 			portname.setParentItem(self)
 			portname.setPlainText(port[0])
-			portname.adjustSize()
+			portname.setTextWidth(100.0)
 
 			name_background = QGraphicsRectItem()
 			name_background.setParentItem(portname)
@@ -267,6 +273,8 @@ class graph_view(QGraphicsView):
 		QGraphicsView.__init__(self)
 		self.zoom_factor_exponent = 0
 		self.zoom_factor_base = 1.1
+		self.setDragMode(QGraphicsView.RubberBandDrag)
+		self.setRubberBandSelectionMode(Qt.IntersectsItemShape)
 		
 	def overlay_timer_timeout(self):
 		pass
@@ -274,10 +282,8 @@ class graph_view(QGraphicsView):
 	def wheelEvent(self, event):
 		if event.modifiers() & Qt.ControlModifier:
 			if event.delta() > 0:
-				print "scroll plus"
 				self.zoom_factor_exponent += 1
 			else:
-				print "scroll minus"
 				self.zoom_factor_exponent -= 1
 				
 			transform = self.transform()
