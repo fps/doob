@@ -1,0 +1,16 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+	"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/io/fps/doob/ladspa" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<interface name="io.fps.doob.ladspa">
+		<signal name="PluginNameChanged">
+			<arg name="Name" type="s"/>
+		</signal>
+		<signal name="PortsChanged">
+			<arg name="Ports" type="a(siis)"/>
+			<annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="LadspaPortList"/>
+		</signal>
+	</interface>
+</node>
+
+
+

@@ -1,0 +1,18 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+	"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/io/fps/doob/ladspa" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<interface name="io.fps.doob.jack_client">
+		<method name="Quit"/>
+		
+		<signal name="JackNameChanged">
+			<arg name="JackName" type="s"/>
+		</signal>
+		
+		<signal name="PortsChanged">
+			<arg name="Ports" type="a(siiii)"/>
+			<annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="JackPortList"/>
+		</signal>
+	</interface>
+</node>
+
+

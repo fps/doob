@@ -1,0 +1,13 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+	"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/io/fps/doob/connector" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<interface name="io.fps.doob.connector">
+		<method name="Quit"/>
+		<signal name="Ready">
+			<arg name="JackName" type="s"/>
+		</signal>
+	</interface>
+</node>
+
+
+
