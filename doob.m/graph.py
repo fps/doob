@@ -14,14 +14,17 @@ class node(QGraphicsRectItem):
 	ACTIVATED = 3
 	
 	IS_PORT = 1
-	IS_LADSPA = 2
-	IS_MIDI_NOTE = 3
+	IS_PORT_CONNECTOR = 2
+	IS_LADSPA = 3
+	IS_MIDI_NOTE = 4
 	
+	NODE_WIDTH = 120
+	NODE_HEIGHT = 120
+	
+	CONNECTOR_SIZE = 3
 	
 	def __init__(self, the_uuid):
 		QGraphicsRectItem.__init__(self)
-		
-		self.setData(node.IS_PORT, QVariant(False))
 		
 		if None == the_uuid:
 			self.uuid = uuid.uuid4().hex
@@ -40,7 +43,7 @@ class node(QGraphicsRectItem):
 		self.highlighed_brush_colors = { node.DEAD: [128, 0, 0], node.ALIVE: [0, 60, 0], node.ACTIVATED: [30, 30, 30] }
 		self.highlight_timer_count = 0
 		
-		self.setRect(0,0,100,100)
+		self.setRect(0, 0, node.NODE_WIDTH, node.NODE_HEIGHT)
 		self.name = "node"
 
 		self.setBrush(QBrush(QColor(48*2, 85*2, 67*2)))
@@ -158,7 +161,7 @@ class ladspa_node(jack_client_node):
 		self.plugin_name = QGraphicsTextItem()
 		self.plugin_name.setParentItem(self)
 		self.plugin_name.setPlainText(self.library + "\n" + self.label)
-		self.plugin_name.setTextWidth(130.0)
+		self.plugin_name.setTextWidth(node.NODE_WIDTH)
 		
 		self.ports = []
 		self.sink_ports = []
@@ -214,7 +217,15 @@ class ladspa_node(jack_client_node):
 			portname.setData(node.IS_PORT, QVariant(True))
 			portname.setParentItem(self)
 			portname.setPlainText(port[0])
-			portname.setTextWidth(100.0)
+			portname.setTextWidth(node.NODE_WIDTH - 20)
+			
+			port_connector = QGraphicsRectItem()
+			port_connector.setData(node.IS_PORT_CONNECTOR, QVariant(True))
+			port_connector.setRect(-node.CONNECTOR_SIZE, -node.CONNECTOR_SIZE, 2*node.CONNECTOR_SIZE, 2*node.CONNECTOR_SIZE)
+			port_connector.setParentItem(portname)
+			port_connector.setBrush(QBrush(QColor(255, 255, 255, 128)))
+			port_connector.setPen(QPen(QColor(0, 0, 0, 0)))
+			port_connector.setY(portname.boundingRect().height() / 2)
 
 			name_background = QGraphicsRectItem()
 			name_background.setParentItem(portname)
@@ -227,22 +238,19 @@ class ladspa_node(jack_client_node):
 
 			self.ports.append(portname)
 			if self.is_port_input(port[1]):
+				port_connector.setX(0)
 				self.sink_ports.append(portname)
 			else:
+				portname.setX(node.NODE_WIDTH - portname.boundingRect().width())
+				port_connector.setX(portname.boundingRect().width())
 				self.source_ports.append(portname)
 
 			portname.setY(y_offset)
 			
 			y_offset += portname.boundingRect().height() + 4
 
-		for port in self.source_ports:
-			the_rect = port.boundingRect()
-			the_bounding_rect = self.childrenBoundingRect()
-			# print(the_bounding_rect.width() - the_rect.width())
-			portname.setX(the_bounding_rect.width() - the_rect.width())
-
 		the_bounding_rect = self.childrenBoundingRect()
-		self.setRect(the_bounding_rect)
+		self.setRect(0, 0, node.NODE_WIDTH, the_bounding_rect.height())
 
 
 	def process_port_changed(self, arg):
@@ -296,7 +304,7 @@ class graph_view(QGraphicsView):
 	def center_of_item(self, item):
 		rect = item.boundingRect()
 		pos = item.scenePos()
-		return QPointF(pos.x() + 0.5 * rect.width(), pos.y() + 0.5 * rect.height())
+		return QPointF(pos.x() + rect.x() + 0.5 * rect.width(), pos.y() + rect.y() + 0.5 * rect.height())
 	
 	def distance(self, pos1, pos2):
 		return math.sqrt(((pos1.x() - pos2.x()) ** 2.0) + ((pos1.y() - pos2.y()) ** 2.0))
@@ -305,7 +313,7 @@ class graph_view(QGraphicsView):
 	def find_closest_port(self, pos):
 		items = self.items()
 		
-		ports = filter(lambda x: x.data(node.IS_PORT).isValid() and x.data(node.IS_PORT).toBool() == True, items)
+		ports = filter(lambda x: x.data(node.IS_PORT_CONNECTOR).isValid(), items)
 		
 		if len(ports) > 0:
 			min_distance = self.distance(self.center_of_item(ports[0]), pos)
@@ -327,6 +335,11 @@ class graph_view(QGraphicsView):
 		QGraphicsView.mouseMoveEvent(self, event)
 
 		pos = self.mapToScene(event.pos())
+		
+		# TODO: find a way to determine whether to draw the line or not
+		#if not self.sceneRect().contains(pos):
+		#	return
+		
 		closest_port = self.find_closest_port(pos)
 		if None == closest_port:
 			return
