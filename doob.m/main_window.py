@@ -98,6 +98,7 @@ class main_window(QMainWindow):
 		# box_layout.addWidget(self.plugin_selector_line_edit)
 		
 		self.plugin_inspector_tree_view = QTreeView()
+		self.plugin_inspector_tree_view.setObjectName("plugin_inspector_tree_view")
 		self.plugin_inspector_dock = QDockWidget()
 		self.plugin_inspector_dock.setObjectName("plugin_inspector_dock")
 		self.plugin_inspector_dock.setWindowTitle("Inspector")
@@ -137,6 +138,7 @@ class main_window(QMainWindow):
 
 
 	def append_to_log(self, x):
+		print x
 		self.log.appendPlainText(x)
 		QApplication.processEvents()
 			
