@@ -107,6 +107,8 @@ class main_window(QMainWindow):
 		
 		self.plugin_inspector_model = plugin_inspector_model(self.scene, self)
 		self.plugin_inspector_tree_view.setModel(self.plugin_inspector_model)
+		self.plugin_inspector_model.modelReset.connect(self.plugin_inspector_tree_view.expandAll)
+		self.plugin_inspector_model.modelReset.connect(lambda: self.plugin_inspector_tree_view.resizeColumnToContents(0))
 		
 		self.settings = QSettings("fps.io", "doob.m")
 		if self.settings.contains("main_window/geometry"):
@@ -131,6 +133,10 @@ class main_window(QMainWindow):
 		self.connection_update_timer.timeout.connect(self.connection_update_timeout)
 		self.connection_update_timer.setSingleShot(False)
 		self.connection_update_timer.start()
+
+	def closeEvent(self, event):
+		QApplication.quit()
+		event.accept()
 
 	def post_show(self):
 		ladspa_plugins = discover_ladspa_plugins(self.append_to_log)

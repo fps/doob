@@ -1,21 +1,13 @@
-import sys
 import os
-import subprocess
 import string
 import json
 
 import dbus
 
 from PyQt4.QtGui import *
-from PyQt4.QtCore import *
 from dbus.mainloop.qt import DBusQtMainLoop
 
-from graph import *
 from main_window import *
-from ladspa import *
-
-
-
 
 app = QApplication(sys.argv)
 
