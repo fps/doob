@@ -9,6 +9,7 @@ A collection of loosely coupled components communicating over DBUS that together
 * PyQt4
 * libqt4-dev (with DBUS support)
 * qdbusxml2cpp
+* libboost-program-options-dev
 
 # Building
 

@@ -291,6 +291,7 @@ class graph_view(QGraphicsView):
 		self.zoom_factor_base = 1.1
 		self.setDragMode(QGraphicsView.RubberBandDrag)
 		self.setRubberBandSelectionMode(Qt.IntersectsItemShape)
+		self.setRenderHints(QPainter.Antialiasing)
 		
 	def overlay_timer_timeout(self):
 		pass
