@@ -27,17 +27,15 @@ def discover_ladspa_plugins(callback = lambda x: x):
 				
 				label_lines = [l for l in library_text.split('\n') if "Plugin Label:" in l]
 				name_lines = [l for l in library_text.split('\n') if "Plugin Name:" in l]
+				
 				for label_line, name_line in zip(label_lines, name_lines):
 					label =  label_line[len("Plugin Label: \""):-1]
 					name =  name_line[len("Plugin Name: \""):-1]
-
 					ladspa_plugins.append({ 'library': lib, 'label': label, 'name': name})
+					callback("LADSPA plugin: " + name + " " + label + " " + lib)
 					
-					if None != callback:
-						callback("LADSPA plugin: " + name + " " + label + " " + lib)
-		except OSError:
-			if None != callback:
-				callback("Problem with: " + path)
+		except OSError as e:
+			callback("Problem with: " + path + ": " + e.strerror)
 	
 	return ladspa_plugins
 

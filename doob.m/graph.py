@@ -279,6 +279,12 @@ class graph_view(QGraphicsView):
 	def overlay_timer_timeout(self):
 		pass
 	
+	def mousePressEvent(self, event):
+		if event.buttons() & Qt.LeftButton:
+			QGraphicsView.mousePressEvent(self, event)
+			
+		pass
+	
 	def wheelEvent(self, event):
 		if event.modifiers() & Qt.ControlModifier:
 			if event.delta() > 0:
