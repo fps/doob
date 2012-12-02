@@ -4,16 +4,16 @@ A collection of loosely coupled components communicating over DBUS that together
 
 # Requirements
 
- * python >= 2.7
- * python-dbus
- * python-qt4-dbus
- * PyQt4
- * libqt4-dev (with DBUS support)
- * libjack-dev
- * ladspa-sdk
- * libboost-dev
- * libboost-program-options-dev
- * qdbusxml2cpp
+* python >= 2.7
+* python-dbus
+* python-qt4-dbus
+* PyQt4
+* libqt4-dev (with DBUS support)
+* libjack-dev
+* ladspa-sdk
+* libboost-dev
+* libboost-program-options-dev
+* qdbusxml2cpp
 
 # Building
 
