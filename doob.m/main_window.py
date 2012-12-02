@@ -56,6 +56,13 @@ class main_window(QMainWindow):
 
 		self.scene = QGraphicsScene()
 		
+		self.potential_connection_line = QGraphicsLineItem()
+		self.potential_connection_line.setLine(0, 0, 100, 100)
+		pen = QPen(QColor(128, 128, 128, 128))
+		pen.setWidth(4.0)
+		self.potential_connection_line.setPen(pen)
+		self.scene.addItem(self.potential_connection_line)
+		
 		self.log = QPlainTextEdit()
 		self.log.setMaximumBlockCount(2000)
 		self.log.setReadOnly(True)

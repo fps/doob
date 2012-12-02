@@ -13,8 +13,15 @@ class node(QGraphicsRectItem):
 	ALIVE = 2
 	ACTIVATED = 3
 	
+	IS_PORT = 1
+	IS_LADSPA = 2
+	IS_MIDI_NOTE = 3
+	
+	
 	def __init__(self, the_uuid):
 		QGraphicsRectItem.__init__(self)
+		
+		self.setData(node.IS_PORT, QVariant(False))
 		
 		if None == the_uuid:
 			self.uuid = uuid.uuid4().hex
@@ -204,6 +211,7 @@ class ladspa_node(jack_client_node):
 		
 		for port in self.port_infos:
 			portname = QGraphicsTextItem()
+			portname.setData(node.IS_PORT, QVariant(True))
 			portname.setParentItem(self)
 			portname.setPlainText(port[0])
 			portname.setTextWidth(100.0)
@@ -284,6 +292,48 @@ class graph_view(QGraphicsView):
 			QGraphicsView.mousePressEvent(self, event)
 			
 		pass
+	
+	def center_of_item(self, item):
+		rect = item.boundingRect()
+		pos = item.scenePos()
+		return QPointF(pos.x() + 0.5 * rect.width(), pos.y() + 0.5 * rect.height())
+	
+	def distance(self, pos1, pos2):
+		return math.sqrt(((pos1.x() - pos2.x()) ** 2.0) + ((pos1.y() - pos2.y()) ** 2.0))
+	
+	# Returns None if no port found
+	def find_closest_port(self, pos):
+		items = self.items()
+		
+		ports = filter(lambda x: x.data(node.IS_PORT).isValid() and x.data(node.IS_PORT).toBool() == True, items)
+		
+		if len(ports) > 0:
+			min_distance = self.distance(self.center_of_item(ports[0]), pos)
+			closest_port = ports[0]
+			
+			for index in range (1, len(ports)):
+				d = self.distance(self.center_of_item(ports[index]), pos)
+				if d < min_distance:
+					min_distance = d
+					closest_port = ports[index]
+			
+			print min_distance
+			return closest_port
+		
+		return None
+		
+	
+	def mouseMoveEvent(self, event):
+		QGraphicsView.mouseMoveEvent(self, event)
+
+		pos = self.mapToScene(event.pos())
+		closest_port = self.find_closest_port(pos)
+		if None == closest_port:
+			return
+		
+		# print closest_port
+		center_of_port = self.center_of_item(closest_port)
+		self.parent().parent().parent().parent().potential_connection_line.setLine(center_of_port.x(), center_of_port.y(), pos.x(), pos.y())
 	
 	def wheelEvent(self, event):
 		if event.modifiers() & Qt.ControlModifier:
