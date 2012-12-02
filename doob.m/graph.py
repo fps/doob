@@ -18,7 +18,7 @@ class node(QGraphicsRectItem):
 	IS_LADSPA = 3
 	IS_MIDI_NOTE = 4
 	
-	NODE_WIDTH = 120
+	NODE_WIDTH = 140
 	NODE_HEIGHT = 120
 	
 	CONNECTOR_SIZE = 3
@@ -109,29 +109,33 @@ class process_node(node):
 		pass
 	
 	def process_error(self):
+		print ("stdout", self.process.readAllStandardOutput())
+		print ("stderr", self.process.readAllStandardError())
 		self.state = node.DEAD
 		
 	def process_finished(self):
 		self.state = node.DEAD
 	
 	def process_ready_read_stdout(self):
-		print ("stdout", self.process.readAllStandardOutput())
+		# print ("stdout", self.process.readAllStandardOutput())
+		pass
 
 	def process_ready_read_stderr(self):
-		print ("stdout", self.process.readAllStandardError())
+		# print ("stderr", self.process.readAllStandardError())
+		pass
 
 	def stop(self):
-		print ("Stopping process:", self.library, self.label)
+		# print ("Stopping process:", self.library, self.label)
 
 		if self.process.state() == QProcess.Running:
-			print "kill process"
+			# print "kill process"
 			os.kill(self.process.pid(), 2)
 			
-			print "wait until finished"
+			# print "wait until finished"
 			self.process.waitForFinished()
 
-			print("stdout", self.process.readAllStandardOutput())
-			print("stderr", self.process.readAllStandardError())
+			#print("stdout", self.process.readAllStandardOutput())
+			#print("stderr", self.process.readAllStandardError())
 
 
 class jack_client_node(process_node):
@@ -186,13 +190,13 @@ class ladspa_node(jack_client_node):
 		return arg & 0x1
 	
 	def process_jack_client_name_changed(self, arg):
-		print ("jack_client name: ", arg)
+		# print ("jack_client name: ", arg)
 		#self.jack_name.setPlainText(str(arg))
 		self.adjust_children()
 		pass
 
 	def process_plugin_name_changed(self, arg):
-		print ("plugin name: ", arg)
+		# print ("plugin name: ", arg)
 		self.plugin_name.setPlainText(str(arg))
 		self.adjust_children()
 		pass
@@ -254,7 +258,7 @@ class ladspa_node(jack_client_node):
 
 
 	def process_port_changed(self, arg):
-		print ("######################### process ports changed", arg)
+		# print ("######################### process ports changed", arg)
 		self.state = node.ACTIVATED
 		self.port_infos = arg
 
@@ -307,6 +311,7 @@ class graph_view(QGraphicsView):
 			
 		if event.button() == Qt.RightButton:
 			self.selected_start_port = None
+			self.update_potential_connection()
 			event.accept()
 			
 	def mousePressEvent(self, event):
@@ -347,14 +352,12 @@ class graph_view(QGraphicsView):
 		return None
 		
 	
-	def mouseMoveEvent(self, event):
-		QGraphicsView.mouseMoveEvent(self, event)
-
-		pos = self.mapToScene(event.pos())
+	def update_potential_connection(self, pos = None):
+		if None == pos:
+			self.the_main_window.potential_connection_line.setVisible(False)
+			return
 		
-		# TODO: find a way to determine whether to draw the line or not
-		#if not self.sceneRect().contains(pos):
-		#	return
+		self.the_main_window.potential_connection_line.setVisible(True)
 		
 		self.closest_port = self.find_closest_port(pos)
 		
@@ -363,9 +366,21 @@ class graph_view(QGraphicsView):
 
 			if self.selected_start_port:
 				center_of_start_port = self.center_of_item(self.selected_start_port)
-				self.the_main_window.potential_connection_line.setLine(center_of_start_port.x(), center_of_start_port.y(), center_of_closest_port.x(), center_of_closest_port.y())
+				if self.selected_start_port != self.closest_port:
+					self.the_main_window.potential_connection_line.setLine(center_of_start_port.x(), center_of_start_port.y(), center_of_closest_port.x(), center_of_closest_port.y())
+				else:
+					self.the_main_window.potential_connection_line.setLine(center_of_start_port.x(), center_of_start_port.y(), pos.x(), pos.y())
+
 			else:
 				self.the_main_window.potential_connection_line.setLine(center_of_closest_port.x(), center_of_closest_port.y(), pos.x(), pos.y())
+
+	
+	def mouseMoveEvent(self, event):
+		QGraphicsView.mouseMoveEvent(self, event)
+
+		pos = self.mapToScene(event.pos())
+		
+		self.update_potential_connection(pos)
 
 	
 	def wheelEvent(self, event):

@@ -6,6 +6,7 @@ import subprocess
 from graph import *
 from ladspa import *
 from plugin_model import *
+from plugin_inspector_model import *
 
 def to_json(python_object):
 	if isinstance(python_object, QGraphicsScene):
@@ -61,6 +62,7 @@ class main_window(QMainWindow):
 		pen = QPen(QColor(128, 128, 128, 128))
 		pen.setWidth(4.0)
 		self.potential_connection_line.setPen(pen)
+		self.potential_connection_line.setVisible(False)
 		self.scene.addItem(self.potential_connection_line)
 		
 		self.log = QPlainTextEdit()
@@ -95,6 +97,15 @@ class main_window(QMainWindow):
 		self.addDockWidget(Qt.TopDockWidgetArea, self.plugin_selector_dock)
 		# box_layout.addWidget(self.plugin_selector_line_edit)
 		
+		self.plugin_inspector_tree_view = QTreeView()
+		self.plugin_inspector_dock = QDockWidget()
+		self.plugin_inspector_dock.setObjectName("plugin_inspector_dock")
+		self.plugin_inspector_dock.setWindowTitle("Inspector")
+		self.plugin_inspector_dock.setWidget(self.plugin_inspector_tree_view)
+		self.addDockWidget(Qt.LeftDockWidgetArea, self.plugin_inspector_dock)
+		
+		self.plugin_inspector_model = plugin_inspector_model(self.scene, self)
+		self.plugin_inspector_tree_view.setModel(self.plugin_inspector_model)
 		
 		self.settings = QSettings("fps.io", "doob.m")
 		if self.settings.contains("main_window/geometry"):
