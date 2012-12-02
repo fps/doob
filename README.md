@@ -7,7 +7,6 @@ A collection of loosely coupled components communicating over DBUS that together
 * python >= 2.7
 * python-dbus
 * PyQt4
-
 * libqt4-dev (with DBUS support)
 * qdbusxml2cpp
 
@@ -19,7 +18,7 @@ Type
 make -j2
 </pre>
 
-to build the project. You can change the -j4 to any -jN where N is the number of parallel make jobs.
+to build the project. You can change the -j2 to any -jN where N is the number of parallel make jobs.
 
 # doob.m
 
