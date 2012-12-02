@@ -285,22 +285,37 @@ class graph_view(QGraphicsView):
 		return {'__class__': 'graph_view', '__value__': [t.m11(), t.m12(), t.m13(), t.m21(), t.m22(), t.m23(), t.m31(), t.m32(), t.m33(), self.verticalScrollBar().value(), self.horizontalScrollBar().value(), self.zoom_factor_exponent ] } 
 	
 	
-	def __init__(self):
+	def __init__(self, the_main_window):
 		QGraphicsView.__init__(self)
+		self.the_main_window = the_main_window
+		
 		self.zoom_factor_exponent = 0
 		self.zoom_factor_base = 1.1
 		self.setDragMode(QGraphicsView.RubberBandDrag)
 		self.setRubberBandSelectionMode(Qt.IntersectsItemShape)
 		self.setRenderHints(QPainter.Antialiasing)
 		
+		self.selected_start_port = None
+		self.closest_port = None
+		
 	def overlay_timer_timeout(self):
 		pass
 	
-	def mousePressEvent(self, event):
-		if event.buttons() & Qt.LeftButton:
-			QGraphicsView.mousePressEvent(self, event)
+	def mouseReleaseEvent(self, event):
+		if event.button() == Qt.LeftButton:
+			QGraphicsView.mouseReleaseEvent(self, event)
 			
-		pass
+		if event.button() == Qt.RightButton:
+			self.selected_start_port = None
+			event.accept()
+			
+	def mousePressEvent(self, event):
+		if event.button() == Qt.LeftButton:
+			QGraphicsView.mousePressEvent(self, event)
+		
+		if event.button() == Qt.RightButton:
+			self.selected_start_port = self.closest_port
+			event.accept()
 	
 	def center_of_item(self, item):
 		rect = item.boundingRect()
@@ -341,13 +356,17 @@ class graph_view(QGraphicsView):
 		#if not self.sceneRect().contains(pos):
 		#	return
 		
-		closest_port = self.find_closest_port(pos)
-		if None == closest_port:
-			return
+		self.closest_port = self.find_closest_port(pos)
 		
-		# print closest_port
-		center_of_port = self.center_of_item(closest_port)
-		self.parent().parent().parent().parent().potential_connection_line.setLine(center_of_port.x(), center_of_port.y(), pos.x(), pos.y())
+		if self.closest_port:
+			center_of_closest_port = self.center_of_item(self.closest_port)
+
+			if self.selected_start_port:
+				center_of_start_port = self.center_of_item(self.selected_start_port)
+				self.the_main_window.potential_connection_line.setLine(center_of_start_port.x(), center_of_start_port.y(), center_of_closest_port.x(), center_of_closest_port.y())
+			else:
+				self.the_main_window.potential_connection_line.setLine(center_of_closest_port.x(), center_of_closest_port.y(), pos.x(), pos.y())
+
 	
 	def wheelEvent(self, event):
 		if event.modifiers() & Qt.ControlModifier:

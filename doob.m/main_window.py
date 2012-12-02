@@ -102,11 +102,7 @@ class main_window(QMainWindow):
 		if self.settings.contains("main_window/state"):
 			self.restoreState(self.settings.value("main_window/state").toByteArray())
 			
-		view1 = graph_view()
-		view1.setScene(self.scene)
-		
 		self.tab_widget = QTabWidget()
-		#self.tab_widget.addTab(view1, "View")
 
 		box_layout.addWidget(self.tab_widget)
 		
@@ -180,7 +176,7 @@ class main_window(QMainWindow):
 			self.scene.removeItem(item)
 	
 	def add_view(self):
-		view = graph_view()
+		view = graph_view(self)
 		view.setScene(self.scene)
 		self.tab_widget.addTab(view, "View")
 
