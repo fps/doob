@@ -4,7 +4,7 @@ import subprocess
 
 # callback can be a callable that takes
 # text as arguments
-def discover_ladspa_plugins(callback = None):
+def discover_ladspa_plugins(callback = lambda x: x):
 	print "Discovering LADSPA plugins"
 	# TODO: more robust discovery?
 	ladspa_plugins = [ ]
@@ -36,7 +36,8 @@ def discover_ladspa_plugins(callback = None):
 					if None != callback:
 						callback("LADSPA plugin: " + name + " " + label + " " + lib)
 		except OSError:
-			callback.append("Problem with: " + path)
+			if None != callback:
+				callback("Problem with: " + path)
 	
 	return ladspa_plugins
 
