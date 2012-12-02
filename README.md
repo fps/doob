@@ -4,12 +4,12 @@ A collection of loosely coupled components communicating over DBUS that together
 
 # Requirements
 
-python >= 2.7
-python-dbus
-PyQt4
+* python >= 2.7
+* python-dbus
+* PyQt4
 
-libqt4-dev (with DBUS support)
-qdbusxml2cpp
+* libqt4-dev (with DBUS support)
+* qdbusxml2cpp
 
 # Building
 
