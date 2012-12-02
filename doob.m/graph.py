@@ -34,7 +34,7 @@ class node(QGraphicsRectItem):
 		self.monospace_font = QFont("monospace")
 		self.monospace_font_metric = QFontMetrics(self.monospace_font)
 		
-		print "node"
+		# print "node"
 		
 		self.state = node.DEAD
 		self.base_brush_color = [48*2, 85*2, 67*2]
@@ -151,7 +151,7 @@ class ladspa_node(jack_client_node):
 	def __init__(self, library, label, the_uuid = None):
 		jack_client_node.__init__(self, the_uuid)
 
-		print type(self)
+		# print type(self)
 		self.library = library
 		self.label = label
 		
@@ -325,7 +325,7 @@ class graph_view(QGraphicsView):
 					min_distance = d
 					closest_port = ports[index]
 			
-			print min_distance
+			# print min_distance
 			return closest_port
 		
 		return None
